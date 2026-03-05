@@ -483,6 +483,149 @@ if analisis:
         st.success(f"✅ Analisis selesai! Berdasarkan profil kamu, **{jurusan_terbaik}** adalah jurusan yang paling direkomendasikan.")
         st.balloons()
 
+        # ── TOMBOL PRINT ───────────────────────────────────────────────────────
+        st.markdown("---")
+        st.markdown("### 🖨️ Cetak Hasil Analisis")
+
+        jurusan_rows_html = ""
+        for rank, (j_name, skor_val) in enumerate(skor_sorted.items(), 1):
+            info_j = JURUSAN[j_name]
+            _, _, label_str = level_warna(skor_val)
+            label_clean = label_str.replace("🟢 ", "").replace("🟡 ", "").replace("🔴 ", "")
+            prospek_str = ", ".join(info_j["prospek"])
+            mapel_str   = ", ".join(info_j["mata_pelajaran"])
+            medal = ["🥇","🥈","🥉","4️⃣"][rank-1]
+            warna_j = info_j["warna"]
+            jurusan_rows_html += (
+                f"<tr>"
+                f"<td style='text-align:center'>{medal}</td>"
+                f"<td><b>{j_name}</b><br><span style='font-size:0.8rem;color:#64748b'>{info_j['deskripsi']}</span></td>"
+                f"<td style='text-align:center'>"
+                f"<div style='background:#e2e8f0;border-radius:6px;height:12px;'>"
+                f"<div style='background:{warna_j};width:{skor_val}%;height:12px;border-radius:6px;'></div></div>"
+                f"<b style='color:{warna_j}'>{skor_val:.1f}%</b></td>"
+                f"<td>{label_clean}</td>"
+                f"<td style='font-size:0.8rem'>{prospek_str}</td>"
+                f"<td style='font-size:0.8rem'>{mapel_str}</td>"
+                f"</tr>"
+            )
+
+        kriteria_rows_html = ""
+        for k, v in sorted(nilai_kriteria.items(), key=lambda x: -x[1]):
+            kriteria_rows_html += (
+                f"<tr>"
+                f"<td>{k}</td>"
+                f"<td style='text-align:center;font-weight:700'>{v}/10</td>"
+                f"<td><div style='background:#e2e8f0;border-radius:4px;height:10px;'>"
+                f"<div style='background:#2563eb;width:{v*10}%;height:10px;border-radius:4px;'></div></div></td>"
+                f"</tr>"
+            )
+
+        minat_str_p = ", ".join(minat_dipilih) if minat_dipilih else "—"
+        mapel_fav_p = ", ".join(mapel_dipilih) if mapel_dipilih else "—"
+        import datetime as _dt
+        tanggal_p = _dt.datetime.now().strftime("%d %B %Y, %H:%M")
+        kekuatan_html    = "".join(f"<li><b>{k}</b>: {v}/10</li>" for k,v in sorted(nilai_kriteria.items(), key=lambda x:-x[1])[:5])
+        development_html = "".join(f"<li><b>{k}</b>: {v}/10 &rarr; perlu ditingkatkan</li>" for k,v in sorted(nilai_kriteria.items(), key=lambda x:x[1])[:5])
+
+        winner_warna  = j_info["warna"]
+        winner_icon   = j_info["icon"]
+        winner_desk   = j_info["deskripsi"]
+        winner_skor   = f"{skor_sorted[jurusan_terbaik]:.1f}"
+
+        print_html = (
+            "<!DOCTYPE html><html lang='id'><head><meta charset='UTF-8'>"
+            f"<title>Hasil Analisis Jurusan - {nama}</title>"
+            "<style>"
+            "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');"
+            "*{box-sizing:border-box;margin:0;padding:0}"
+            "body{font-family:'Inter',Arial,sans-serif;background:#f8fafc;color:#1e293b}"
+            ".page{max-width:900px;margin:0 auto;padding:28px 20px}"
+            ".header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:white;border-radius:14px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}"
+            ".header h1{font-size:1.4rem;font-weight:700}"
+            ".header p{font-size:0.83rem;opacity:.85;margin-top:3px}"
+            ".id-card{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap}"
+            ".id-item label{font-size:0.7rem;color:#94a3b8;font-weight:600;text-transform:uppercase}"
+            ".id-item span{font-size:0.92rem;font-weight:700}"
+            f".winner{{border-radius:14px;padding:18px 22px;margin-bottom:16px;border:2px solid {winner_warna};text-align:center;background:linear-gradient(135deg,{winner_warna}18,{winner_warna}06)}}"
+            f".winner .icon{{font-size:2.4rem}}.winner h2{{color:{winner_warna};font-size:0.88rem;margin:4px 0 2px}}"
+            ".winner h1{font-size:1.4rem;color:#0f172a}.winner p{color:#64748b;font-size:0.83rem;margin:5px 0 10px}"
+            f".winner .badge{{display:inline-block;background:{winner_warna};color:white;padding:4px 18px;border-radius:20px;font-weight:700;font-size:1rem}}"
+            ".section-title{font-size:0.92rem;font-weight:700;color:#1e3a8a;border-left:4px solid #2563eb;padding-left:9px;margin:18px 0 9px}"
+            "table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;margin-bottom:14px}"
+            "th{background:#1e3a8a;color:white;padding:8px 10px;font-size:0.76rem;text-align:left;font-weight:600}"
+            "td{padding:8px 10px;border-bottom:1px solid #f1f5f9;font-size:0.8rem;vertical-align:middle}"
+            "tr:last-child td{border-bottom:none}"
+            ".grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}"
+            ".card{background:white;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px}"
+            ".card h4{font-size:0.83rem;color:#2563eb;margin-bottom:7px;font-weight:700}"
+            ".card li{font-size:0.78rem;color:#374151;margin-bottom:3px;margin-left:15px}"
+            ".footer{text-align:center;color:#94a3b8;font-size:0.73rem;margin-top:26px;padding-top:12px;border-top:1px solid #e2e8f0}"
+            "@media print{body{background:white}.page{padding:10px;max-width:100%}}"
+            "</style></head><body><div class='page'>"
+            "<div class='header'>"
+            "<div><h1>🎓 Politeknik Krakatau</h1>"
+            "<p>Sistem Rekomendasi Jurusan untuk Calon Mahasiswa</p></div>"
+            f"<div style='text-align:right;font-size:0.8rem;opacity:.85'><div>📅 {tanggal_p}</div></div>"
+            "</div>"
+            "<div class='id-card'>"
+            f"<div class='id-item'><label>Nama</label><br><span>{nama}</span></div>"
+            f"<div class='id-item'><label>Asal Sekolah</label><br><span>{asal_sekolah if asal_sekolah else '—'}</span></div>"
+            f"<div class='id-item'><label>Jurusan Asal</label><br><span>{jurusan_asal}</span></div>"
+            f"<div class='id-item'><label>Minat</label><br><span style='font-size:0.8rem'>{minat_str_p}</span></div>"
+            f"<div class='id-item'><label>Mapel Favorit</label><br><span style='font-size:0.8rem'>{mapel_fav_p}</span></div>"
+            "</div>"
+            "<div class='winner'>"
+            f"<div class='icon'>{winner_icon}</div>"
+            "<h2>⭐ Jurusan Terbaik Untukmu</h2>"
+            f"<h1>{jurusan_terbaik}</h1>"
+            f"<p>{winner_desk}</p>"
+            f"<span class='badge'>{winner_skor}% Kecocokan</span>"
+            "</div>"
+            "<div class='section-title'>📋 Perbandingan Semua Jurusan</div>"
+            "<table><thead><tr>"
+            "<th style='width:34px'>#</th><th>Jurusan</th>"
+            "<th style='width:130px'>Kecocokan</th><th style='width:90px'>Status</th>"
+            "<th>Prospek Karier</th><th>Mapel Pendukung</th>"
+            f"</tr></thead><tbody>{jurusan_rows_html}</tbody></table>"
+            "<div class='section-title'>🧠 Profil Kemampuan</div>"
+            "<table><thead><tr><th>Kriteria</th><th style='width:62px'>Nilai</th><th>Grafik</th></tr></thead>"
+            f"<tbody>{kriteria_rows_html}</tbody></table>"
+            "<div class='section-title'>💡 Rekomendasi Personal</div>"
+            "<div class='grid2'>"
+            f"<div class='card'><h4>✅ Kekuatan Kamu</h4><ul>{kekuatan_html}</ul></div>"
+            f"<div class='card'><h4>📈 Area Pengembangan</h4><ul>{development_html}</ul></div>"
+            "</div>"
+            "<div class='footer'>"
+            f"© Politeknik Krakatau &nbsp;|&nbsp; {tanggal_p}<br>"
+            "<i>Hasil analisis bersifat rekomendasi dan tidak menggantikan konsultasi dengan konselor akademik.</i>"
+            "</div>"
+            "</div>"
+            "<script>window.onload=function(){window.print();}</script>"
+            "</body></html>"
+        )
+
+        import base64 as _b64
+        b64 = _b64.b64encode(print_html.encode("utf-8")).decode()
+        href = f"data:text/html;base64,{b64}"
+        safe_nama = nama.replace(" ", "_")
+
+        col_p1, col_p2, col_p3 = st.columns([1,2,1])
+        with col_p2:
+            st.markdown(
+                f"<div style='text-align:center;margin:0.5rem 0 1rem;'>"
+                f"<a href='{href}' download='Hasil_Analisis_{safe_nama}.html' target='_blank'"
+                f" style='display:inline-block;background:linear-gradient(135deg,#1e3a8a,#2563eb);"
+                f"color:white;text-decoration:none;padding:13px 40px;border-radius:12px;"
+                f"font-weight:700;font-size:1.05rem;box-shadow:0 4px 14px rgba(37,99,235,0.4);'>"
+                f"🖨️ &nbsp; Unduh &amp; Cetak Hasil Analisis"
+                f"</a>"
+                f"<p style='color:#64748b;font-size:0.8rem;margin-top:8px;'>"
+                f"Klik tombol → file HTML terbuka di tab baru, lalu <b>Ctrl+P</b> / <b>Cmd+P</b> untuk cetak atau simpan sebagai PDF"
+                f"</p></div>",
+                unsafe_allow_html=True
+            )
+
 else:
     # ── Placeholder sebelum analisis ──────────────────────────────────────────
     st.markdown("### 🏛️ Tentang Jurusan")
