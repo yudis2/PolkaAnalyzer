@@ -416,11 +416,11 @@ if analisis:
         col_g1, col_g2 = st.columns([1, 1])
         with col_g1:
             st.markdown("#### 📈 Perbandingan Kecocokan")
-            st.plotly_chart(bar_comparison(skor_sorted), use_container_width=True)
+            st.plotly_chart(bar_comparison(skor_sorted), use_container_width=True, key="bar_comparison")
 
         with col_g2:
             st.markdown(f"#### 🕸️ Profil Kemampuan — {jurusan_terbaik}")
-            st.plotly_chart(radar_chart(nilai_kriteria, jurusan_terbaik), use_container_width=True)
+            st.plotly_chart(radar_chart(nilai_kriteria, jurusan_terbaik), use_container_width=True, key="radar_terbaik")
 
         # ── Daftar semua jurusan ───────────────────────────────────────────────
         st.markdown("### 📋 Detail Kecocokan Semua Jurusan")
@@ -448,7 +448,7 @@ if analisis:
                         </div>
                     </div>""", unsafe_allow_html=True)
                 with c2:
-                    st.plotly_chart(radar_chart(nilai_kriteria, j_name), use_container_width=True)
+                    st.plotly_chart(radar_chart(nilai_kriteria, j_name), use_container_width=True, key=f"radar_{j_name}")
 
         # ── Rekomendasi Personal ───────────────────────────────────────────────
         st.markdown("### 💡 Rekomendasi Personal")
